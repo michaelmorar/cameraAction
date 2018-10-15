@@ -28,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
     private MainActivityViewModel mainActivityViewModel;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,8 +51,8 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
-            Log.v("Bitmap", imageBitmap.toString());
-            mImageView. setImageBitmap(imageBitmap);
+            Log.v("Bitmap_Output", imageBitmap.toString());
+            mImageView.setImageBitmap(imageBitmap);
         }
     }
 
@@ -63,5 +62,4 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
     }
-
 }
