@@ -30,33 +30,33 @@ import java.util.List;
 @Dao
 public interface ImageDao {
     /**
-     * Selects all {@link ListImageResult} entries for a given imageId. The LiveData will
+     * Selects all {@link ListImageResult} entries for a given id. The LiveData will
      * be kept in sync with the database, so that it will automatically notify observers when the
      * values in the table change.
      *
-     * @param imageId A {@link String} for which to select Image results
-     * @return {@link LiveData} list of all {@link ListImageResult} objects for that imageId
+     * @param id A {@link String} for which to select Image results
+     * @return {@link LiveData} list of all {@link ListImageResult} objects for that id
      */
-    @Query("SELECT imageId, image_result FROM image_data WHERE imageId = :imageId")
-    LiveData<List<ListImageResult>> getCurrentImageResults(String imageId);
+    @Query("SELECT id, image_result FROM image_data WHERE id = :id")
+    LiveData<List<ListImageResult>> getCurrentImageResults(String id);
 
     /**
-     * Returns a count of database entries for a given imageId
+     * Returns a count of database entries for a given id
      *
-     * @param imageId The date to select after (inclusive)
-     * @return Number of Image Results for that imageId
+     * @param id The date to select after (inclusive)
+     * @return Number of Image Results for that id
      */
-    @Query("SELECT COUNT(*) FROM image_data WHERE imageId = :imageId")
-    int countReultsforImage(String imageId);
+    @Query("SELECT COUNT(*) FROM image_data WHERE id = :id")
+    int countResultsforImage(String id);
 
     /**
      * Gets the results for a given single image
      *
-     * @param imageId The image for which we want a result
+     * @param id The image for which we want a result
      * @return {@link LiveData} with weather for a single day
      */
-    @Query("SELECT * FROM image_data WHERE imageId = :imageId")
-    LiveData<ImageResult> getImageResult(String imageId);
+    @Query("SELECT * FROM image_data WHERE id = :id")
+    LiveData<ImageResult> getImageResult(String id);
 
     /**
      * Inserts a list of {@link ImageResult} into the image_result table. If there is a conflicting id
@@ -71,9 +71,9 @@ public interface ImageDao {
     /**
      * Deletes specified ImageResult
      *
-     * @param imageId ImageResult to delete
+     * @param id ImageResult to delete
      */
-    @Query("DELETE FROM image_data WHERE imageId = :imageId")
-    void deleteOldImageResults(String imageId);
+    @Query("DELETE FROM image_data WHERE id = :id")
+    void deleteOldImageResults(String id);
 
 }

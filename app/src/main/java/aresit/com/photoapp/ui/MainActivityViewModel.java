@@ -18,7 +18,7 @@ public class MainActivityViewModel extends ViewModel {
 
     }
 
-    public LiveData<List<ImageResult>> getForecast() {
+    public LiveData<List<ImageResult>> getImageResults() {
         return mImageResult;
     }
 

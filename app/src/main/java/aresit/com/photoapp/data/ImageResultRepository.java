@@ -19,7 +19,7 @@ public class PhotoRepository {
 
     //TODO - add constructor
 
-    /**
+    /** TODO -this method not needed in this case - simplified implementation uses REST pattern
      * Creates periodic sync tasks and checks to see if an immediate sync is required. If an
      * immediate sync is required, this method will take care of making sure that sync occurs.
      */
@@ -45,7 +45,7 @@ public class PhotoRepository {
      * Database related operations
      **/
 
-    public LiveData<List<ListImageResult>> getCurrentImageResults() {
+/**    public LiveData<List<ListImageResult>> getCurrentImageResults() {
         initialiseData();
         //Date today = SunshineDateUtils.getNormalizedUtcDateForToday();
         return mWeatherDao.getCurrentWeatherForecasts(today);
@@ -55,34 +55,33 @@ public class PhotoRepository {
         initializeData();
         return mWeatherDao.getWeatherByDate(date);
     }
-
+**/
     /**
      * Deletes old weather data because we don't need to keep multiple days' data
      */
-    private void deleteOldData() {
-        Date today = SunshineDateUtils.getNormalizedUtcDateForToday();
-        mWeatherDao.deleteOldWeather(today);
-    }
+/**    private void deleteOldData() {
 
+    }
+**/
     /**
      * Checks if there are enough days of future weather for the app to display all the needed data.
      *
      * @return Whether a fetch is needed
      */
-    private boolean isFetchNeeded() {
+/**    private boolean isFetchNeeded() {
         Date today = SunshineDateUtils.getNormalizedUtcDateForToday();
         int count = mWeatherDao.countAllFutureWeather(today);
         return (count < WeatherNetworkDataSource.NUM_DAYS);
     }
-
+/**
     /**
      * Network related operation
      */
-
+/** not needed in this case
     private void startFetchWeatherService() {
         mWeatherNetworkDataSource.startFetchWeatherService();
     }
-
+**/
 
 }
 
