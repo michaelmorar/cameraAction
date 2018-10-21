@@ -2,28 +2,39 @@ package aresit.com.photoapp.data;
 
 import android.arch.lifecycle.LiveData;
 
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
-import aresit.com.photoapp.AppExecutors;
-import aresit.com.photoapp.data.database.ImageDao;
-import aresit.com.photoapp.data.database.ListImageResult;
 import aresit.com.photoapp.data.network.ImageResultNetworkDataSource;
 
-public class PhotoRepository {
+public class ImageResultRepository {
 
-    private final ImageDao mWeatherDao;
+    //private final ImageDao mWeatherDao;
     private final ImageResultNetworkDataSource mImageResultNetworkDataSource;
-    private final AppExecutors mExecutors;
-    private boolean mInitialised = false;
+    //private final AppExecutors mExecutors;
+    //private boolean mInitialised = false;
 
-    //TODO - add constructor
+    public ImageResultRepository(ImageResultNetworkDataSource mImageResultNetworkDataSource) {
+        this.mImageResultNetworkDataSource = mImageResultNetworkDataSource;
+    }
+
+    public LiveData<List<ImageResult>> getImageResults() {
+        //TODO - create a dummy livedata object complete with observer - hopefully no need for dao yet
+        Random random = new Random(System.nanoTime());
+        List<ImageResult> imageResults = new ArrayList<ImageResult>();
+        imageResults.add(new ImageResult("1", "weasel", random.nextDouble(), ClassifierProvider.EINSTEINAI));
+        imageResults.add(new ImageResult("2", "rat", random.nextDouble(), ClassifierProvider.GOOGLEAPI));
+        imageResults.add(new ImageResult("3", "field mouse", random.nextDouble(), ClassifierProvider.LOCALAPI));
+        return new LiveData(imageResults);
+    }
+}
 
     /** TODO -this method not needed in this case - simplified implementation uses REST pattern
      * Creates periodic sync tasks and checks to see if an immediate sync is required. If an
      * immediate sync is required, this method will take care of making sure that sync occurs.
      */
-    private synchronized void initialiseData() {
+    /**private synchronized void initialiseData() {
 
         // Only perform initialization once per app lifetime. If initialization has already been
         // performed, we have nothing to do in this method.
@@ -39,6 +50,7 @@ public class PhotoRepository {
             }
         });
     }
+    **/
 
 
     /**
@@ -83,6 +95,6 @@ public class PhotoRepository {
     }
 **/
 
-}
+
 
 //getCurrentImageResults

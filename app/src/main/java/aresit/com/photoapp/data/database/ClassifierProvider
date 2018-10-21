@@ -1,3 +1,0 @@
-public enum ClassifierProvider {
-    EINSTEINAI, TENSORFLOW_LOCAL, GOOGLE_AI
-}
