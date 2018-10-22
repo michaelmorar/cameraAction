@@ -1,5 +1,6 @@
 package aresit.com.photoapp.ui;
 
+import android.arch.lifecycle.ComputableLiveData;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
@@ -19,29 +20,16 @@ import static android.support.constraint.Constraints.TAG;
 
 
 public class MainActivityViewModel extends ViewModel {
-    private MutableLiveData<List<ImageResult>> mImageResult;
+    private final MutableLiveData<List<ImageResult>> mImageResult;
+    private final ImageResultRepository mRepository;
 
     public MainActivityViewModel(ImageResultRepository imageResultRepository) {
-    //    this.mRepository = mRepository;
+        this.mRepository = imageResultRepository;
         LiveData<List<ImageResult>> imageResult = imageResultRepository.getImageResults();
         this.mImageResult = (MutableLiveData<List<ImageResult>>) imageResult;
     }
 
-    public LiveData<List<ImageResult>> getImageResult() {
-        if (mImageResult == null) {
-            mImageResult = new MutableLiveData<>();
-            //TODO - implement
-            loadImageResults();
-        }
-        return mImageResult;
-    }
 
-    private void loadImageResults() {
-        Handler myHandler = new Handler();
-        myHandler.postDelayed(() -> {
-
-        }, 5000);
-    }
 
     @Override
     protected void onCleared() {

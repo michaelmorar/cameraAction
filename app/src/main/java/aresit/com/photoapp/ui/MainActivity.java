@@ -15,10 +15,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-
 import aresit.com.photoapp.R;
-import aresit.com.photoapp.ui.ImageResultsAdapter;
-import aresit.com.photoapp.ui.MainActivityViewModel;
+import aresit.com.photoapp.utilities.InjectorUtils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,14 +27,16 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton cameraAction;
     private ProgressBar mProgressBar;
     static final int REQUEST_IMAGE_CAPTURE = 1;
-    private MainActivityViewModel mainActivityViewModel;
+    private MainActivityViewModel mViewModel;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        Log.v("1t", "CP1");
 
+        setContentView(R.layout.activity_main);
+        Log.v("2t", "CP2");
         findViewsbyID();
 
         /**The ForecastAdapter requires an
@@ -53,13 +53,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mImageAdapter = new ImageResultsAdapter(this, (ImageResultsAdapter.ImageResultAdapterOnItemClickHandler) this);
+        mImageAdapter = new ImageResultsAdapter(this, this);
+
+
 
         /* Setting the adapter attaches it to the RecyclerView in our layout. */
         mRecyclerView.setAdapter(mImageAdapter);
         MainViewModelFactory factory = InjectorUtils.provideMainActivityViewModelFactory(this.getApplicationContext());
         mViewModel = ViewModelProviders.of(this, factory).get(MainActivityViewModel.class);
-
 
     }
 
@@ -81,13 +82,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void findViewsbyID() {
-        mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
+        Log.v("3t", "CP3");
         mButton = (Button) findViewById(R.id.classify_button);
         mRecyclerView = findViewById(R.id.recyclerView_results);
         mImageView = (ImageView) findViewById(R.id.mgView);
         cameraAction = (FloatingActionButton) findViewById(R.id.camFloatingActionButton);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar_loading);
-
+        Log.v("4t", "CP4");
         LinearLayoutManager layoutManager =
                 new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 

@@ -1,33 +1,57 @@
 package aresit.com.photoapp.data;
 
-import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
+import android.media.Image;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import aresit.com.photoapp.AppExecutors;
 import aresit.com.photoapp.data.network.ImageResultNetworkDataSource;
 
 public class ImageResultRepository {
 
-    //private final ImageDao mWeatherDao;
-    private final ImageResultNetworkDataSource mImageResultNetworkDataSource;
-    //private final AppExecutors mExecutors;
-    //private boolean mInitialised = false;
+    private static final String LOG_TAG = ImageResultRepository.class.getSimpleName();
 
-    public ImageResultRepository(ImageResultNetworkDataSource mImageResultNetworkDataSource) {
+    //private final ImageDao mWeatherDao;
+    private static final Object LOCK = new Object();
+    private final ImageResultNetworkDataSource mImageResultNetworkDataSource;
+    private final AppExecutors mExecutors;
+    //private boolean mInitialised = false;
+    public static ImageResultRepository sInstance;
+
+    public ImageResultRepository(ImageResultNetworkDataSource mImageResultNetworkDataSource, AppExecutors executors) {
         this.mImageResultNetworkDataSource = mImageResultNetworkDataSource;
+        this.mExecutors = executors;
     }
 
-    public LiveData<List<ImageResult>> getImageResults() {
+    public MutableLiveData<List<ImageResult>> getImageResults() {
         //TODO - create a dummy livedata object complete with observer - hopefully no need for dao yet
         Random random = new Random(System.nanoTime());
         List<ImageResult> imageResults = new ArrayList<ImageResult>();
         imageResults.add(new ImageResult("1", "weasel", random.nextDouble(), ClassifierProvider.EINSTEINAI));
         imageResults.add(new ImageResult("2", "rat", random.nextDouble(), ClassifierProvider.GOOGLEAPI));
         imageResults.add(new ImageResult("3", "field mouse", random.nextDouble(), ClassifierProvider.LOCALAPI));
-        return new LiveData(imageResults);
+        MutableLiveData<List<ImageResult>> mle = new MutableLiveData<List<ImageResult>>();
+        mle.postValue(imageResults);
+        return mle;
     }
+
+    public synchronized static ImageResultRepository getInstance(
+            ImageResultNetworkDataSource imageResultNetworkDataSource,
+            AppExecutors executors) {
+        Log.d(LOG_TAG, "Getting the repository");
+        if (sInstance == null) {
+            synchronized (LOCK) {
+                sInstance = new ImageResultRepository(imageResultNetworkDataSource, executors);
+                Log.d(LOG_TAG, "Made new repository");
+            }
+        }
+        return sInstance;
+    }
+
 }
 
     /** TODO -this method not needed in this case - simplified implementation uses REST pattern
