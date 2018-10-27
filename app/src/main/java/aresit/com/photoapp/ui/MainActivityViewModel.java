@@ -17,6 +17,7 @@ import aresit.com.photoapp.data.ImageResult;
 import aresit.com.photoapp.data.ImageResultRepository;
 
 import static android.support.constraint.Constraints.TAG;
+import static android.view.ViewGroup.getChildMeasureSpec;
 
 
 public class MainActivityViewModel extends ViewModel {
@@ -29,6 +30,9 @@ public class MainActivityViewModel extends ViewModel {
         this.mImageResult = (MutableLiveData<List<ImageResult>>) imageResult;
     }
 
+    public LiveData<List<ImageResult>> getImageResults() {
+        return mRepository.getImageResults();
+    }
 
 
     @Override

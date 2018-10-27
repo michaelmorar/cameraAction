@@ -39,6 +39,7 @@ public class ImageResultRepository {
         return mle;
     }
 
+
     public synchronized static ImageResultRepository getInstance(
             ImageResultNetworkDataSource imageResultNetworkDataSource,
             AppExecutors executors) {

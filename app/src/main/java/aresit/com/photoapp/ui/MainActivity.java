@@ -1,5 +1,6 @@
 package aresit.com.photoapp.ui;
 
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,14 +15,24 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import java.util.Date;
+import java.util.List;
 
 import aresit.com.photoapp.R;
+import aresit.com.photoapp.data.ImageResult;
 import aresit.com.photoapp.utilities.InjectorUtils;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ImageResultsAdapter.ImageResultAdapterOnItemClickHandler{
 
     private ImageResultsAdapter mImageAdapter;
     private ImageView mImageView;
+    private TextView mIdView;
+    private TextView mLabelView;
+    private TextView mProbabilityView;
+    private TextView mClassifierProviderView;
+    private int mPosition = RecyclerView.NO_POSITION;
     private RecyclerView mRecyclerView;
     private Button mButton;
     private FloatingActionButton cameraAction;
@@ -33,11 +44,39 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.v("1t", "CP1");
-
         setContentView(R.layout.activity_main);
-        Log.v("2t", "CP2");
-        findViewsbyID();
+
+        mRecyclerView = findViewById(R.id.recyclerview_results);
+        findViewsByID();
+
+        LinearLayoutManager layoutManager =
+                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+
+        /* setLayoutManager associates the LayoutManager we created above with our RecyclerView */
+        mRecyclerView.setLayoutManager(layoutManager);
+
+        /*
+         * Use this setting to improve performance if you know that changes in content do not
+         * change the child layout size in the RecyclerView
+         */
+        mRecyclerView.setHasFixedSize(true);
+
+        /* Setting the adapter attaches it to the RecyclerView in our layout. */
+        mImageAdapter = new ImageResultsAdapter(this, this);
+        mRecyclerView.setAdapter(mImageAdapter);
+        MainViewModelFactory factory = InjectorUtils.provideMainActivityViewModelFactory(this.getApplicationContext());
+        mViewModel = ViewModelProviders.of(this, factory).get(MainActivityViewModel.class);
+
+        mViewModel.getImageResults().observe(this, imageResults -> {
+            mImageAdapter.swapForecast(imageResults);
+            if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
+            mRecyclerView.smoothScrollToPosition(mPosition);
+            // Show the image result list or the loading screen based on whether the image result data exists
+            // and is loaded
+            if (imageResults != null && imageResults.size() != 0) showImageResultView();
+            else showLoading();
+        });
+
 
         /**The ForecastAdapter requires an
          * Android Context (which all Activities are) as well as an onClickHandler. Since our
@@ -53,15 +92,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mImageAdapter = new ImageResultsAdapter(this, this);
 
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public  void onClick(View v) {
+                mViewModel.getImageResults();
 
-
-        /* Setting the adapter attaches it to the RecyclerView in our layout. */
-        mRecyclerView.setAdapter(mImageAdapter);
-        MainViewModelFactory factory = InjectorUtils.provideMainActivityViewModelFactory(this.getApplicationContext());
-        mViewModel = ViewModelProviders.of(this, factory).get(MainActivityViewModel.class);
-
+            }
+        });
     }
 
     @Override
@@ -71,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             Log.v("Bitmap_Output", imageBitmap.toString());
             mImageView.setImageBitmap(imageBitmap);
+
         }
     }
 
@@ -81,25 +120,56 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void findViewsbyID() {
-        Log.v("3t", "CP3");
-        mButton = (Button) findViewById(R.id.classify_button);
-        mRecyclerView = findViewById(R.id.recyclerView_results);
-        mImageView = (ImageView) findViewById(R.id.mgView);
-        cameraAction = (FloatingActionButton) findViewById(R.id.camFloatingActionButton);
-        mProgressBar = (ProgressBar) findViewById(R.id.progressBar_loading);
+    private void findViewsByID() {
+        mButton = findViewById(R.id.classify_button);
+        mLabelView = findViewById(R.id.label_view);
+        mProbabilityView = findViewById(R.id.probability_view);
+        mClassifierProviderView = findViewById(R.id.classifier_view);
+        mImageView = findViewById(R.id.mgView);
+        cameraAction = findViewById(R.id.camFloatingActionButton);
+        mProgressBar = findViewById(R.id.progressBar_loading);
+        mProgressBar.setVisibility(View.INVISIBLE);
+
         Log.v("4t", "CP4");
-        LinearLayoutManager layoutManager =
-                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-
-        /* setLayoutManager associates the LayoutManager we created above with our RecyclerView */
-        mRecyclerView.setLayoutManager(layoutManager);
-
-        /*
-         * Use this setting to improve performance if you know that changes in content do not
-         * change the child layout size in the RecyclerView
-         */
-        mRecyclerView.setHasFixedSize(true);
 
     }
+
+    /**
+     * This method is for responding to clicks from our list.
+     * So far, there is nothing to do so we "swallow" the click
+     *
+     */
+    @Override
+    public void onItemClick() {
+        Log.v("Clicked", "I intend to take action");
+    }
+
+    /**
+     * This method will make the View for the image result data visible and hide the error message and
+     * loading indicator.
+     * <p>
+     * Since it is okay to redundantly set the visibility of a View, we don't need to check whether
+     * each view is currently visible or invisible.
+     */
+    private void showImageResultView() {
+        // First, hide the loading indicator
+        mProgressBar.setVisibility(View.INVISIBLE);
+        // Finally, make sure the weather data is visible
+        mRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * This method will make the loading indicator visible and hide the image result View and error
+     * message.
+     * <p>
+     * Since it is okay to redundantly set the visibility of a View, we don't need to check whether
+     * each view is currently visible or invisible.
+     */
+    private void showLoading() {
+        // Then, hide the weather data
+        mRecyclerView.setVisibility(View.INVISIBLE);
+        // Finally, show the loading indicator
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
 }

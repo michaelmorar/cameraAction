@@ -47,7 +47,7 @@
         app:layout_constraintVertical_bias="0.052" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerView_results"
+        android:id="@+id/recyclerview_results"
         android:layout_width="340dp"
         android:layout_height="106dp"
         android:layout_marginStart="16dp"
@@ -65,6 +65,6 @@
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recyclerView_results" />
+        app:layout_constraintTop_toBottomOf="@+id/recyclerview_results" />
 
 </android.support.constraint.ConstraintLayout>

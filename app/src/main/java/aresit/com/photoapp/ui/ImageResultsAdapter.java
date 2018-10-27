@@ -2,6 +2,7 @@ package aresit.com.photoapp.ui;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,10 +42,11 @@ public class ImageResultsAdapter extends RecyclerView.Adapter<ImageResultsAdapte
     @Override
     public ImageResultsAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 
-        int layoutId = android.R.layout.activity_list_item;
+        int layoutId = R.layout.imageresults;
         View view = LayoutInflater.from(mContext).inflate(layoutId, viewGroup, false);
         view.setFocusable(true);
         return new ImageResultsAdapterViewHolder(view);
+
     }
 
 
@@ -67,7 +69,6 @@ public class ImageResultsAdapter extends RecyclerView.Adapter<ImageResultsAdapte
     ImageResultsAdapter(@NonNull Context context, ImageResultAdapterOnItemClickHandler clickHandler) {
         mContext = context;
         mClickHandler = clickHandler;
-        //mUseTodayLayout = mContext.getResources().getBoolean(R.bool.use_today_layout);
     }
 
     /**
@@ -84,13 +85,6 @@ public class ImageResultsAdapter extends RecyclerView.Adapter<ImageResultsAdapte
     public void onBindViewHolder(ImageResultsAdapterViewHolder imageResultsAdapterViewHolder, int position) {
         ImageResult imageResult = mImageResult.get(position);
 
-
-        /****************
-         * ImageId *
-         ****************/
-
-        /* Display Image Id */
-        imageResultsAdapterViewHolder.idView.setText(imageResult.getImageId());
 
         /***********************
          * Label *
@@ -109,6 +103,54 @@ public class ImageResultsAdapter extends RecyclerView.Adapter<ImageResultsAdapte
         imageResultsAdapterViewHolder.classifierProviderView.setContentDescription(imageResult.getClassifierProvider().toString());
     }
 
+    /**
+     * Swaps the list used by the ImageResultsAdapter for its image results data. This method is called by
+     * {@link MainActivity} after a load has finished. When this method is called, we assume we have
+     * a new set of data, so we call notifyDataSetChanged to tell the RecyclerView to update.
+     *
+     * @param newImageResult the new list of forecasts to use as ForecastAdapter's data source
+     */
+    void swapForecast(final List<ImageResult> newImageResult) {
+        // If there was no forecast data, then recreate all of the list
+        if (mImageResult == null) {
+            mImageResult = newImageResult;
+            notifyDataSetChanged();
+        } else {
+            /*
+             * Otherwise we use DiffUtil to calculate the changes and update accordingly. This
+             * shows the four methods you need to override to return a DiffUtil callback. The
+             * old list is the current list stored in mForecast, where the new list is the new
+             * values passed in from the observing the database.
+             */
+
+            DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+                @Override
+                public int getOldListSize() {
+                    return mImageResult.size();
+                }
+
+                @Override
+                public int getNewListSize() {
+                    return mImageResult.size();
+                }
+
+                @Override
+                public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                    return mImageResult.get(oldItemPosition).getImageId() ==
+                            mImageResult.get(newItemPosition).getImageId();
+                }
+
+                @Override
+                public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                    ImageResult newIR = newImageResult.get(newItemPosition);
+                    ImageResult oldIR = mImageResult.get(oldItemPosition);
+                    return newIR.getImageId() == oldIR.getImageId();
+                }
+            });
+            mImageResult = newImageResult;
+            result.dispatchUpdatesTo(this);
+        }
+    }
 
 
     /**
@@ -118,7 +160,6 @@ public class ImageResultsAdapter extends RecyclerView.Adapter<ImageResultsAdapte
      */
     class ImageResultsAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        final TextView idView;
         final TextView labelView;
         final TextView probabilityView;
         final TextView classifierProviderView;
@@ -126,10 +167,9 @@ public class ImageResultsAdapter extends RecyclerView.Adapter<ImageResultsAdapte
         ImageResultsAdapterViewHolder(View view) {
             super(view);
 
-            idView = view.findViewById(R.id.id_view);
             labelView = view.findViewById(R.id.label_view);
             probabilityView = view.findViewById(R.id.probability_view);
-            classifierProviderView = view.findViewById(R.id.classifier_provider_view);
+            classifierProviderView = view.findViewById(R.id.classifier_view);
 
             view.setOnClickListener(this);
         }
