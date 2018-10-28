@@ -21,6 +21,8 @@ public class ImageResultRepository {
     private final AppExecutors mExecutors;
     //private boolean mInitialised = false;
     public static ImageResultRepository sInstance;
+    private boolean mInitialised;
+    MutableLiveData<List<ImageResult>> mImageResults;
 
     public ImageResultRepository(ImageResultNetworkDataSource mImageResultNetworkDataSource, AppExecutors executors) {
         this.mImageResultNetworkDataSource = mImageResultNetworkDataSource;
@@ -29,14 +31,8 @@ public class ImageResultRepository {
 
     public MutableLiveData<List<ImageResult>> getImageResults() {
         //TODO - create a dummy livedata object complete with observer - hopefully no need for dao yet
-        Random random = new Random(System.nanoTime());
-        List<ImageResult> imageResults = new ArrayList<ImageResult>();
-        imageResults.add(new ImageResult("1", "weasel", random.nextDouble(), ClassifierProvider.EINSTEINAI));
-        imageResults.add(new ImageResult("2", "rat", random.nextDouble(), ClassifierProvider.GOOGLEAPI));
-        imageResults.add(new ImageResult("3", "field mouse", random.nextDouble(), ClassifierProvider.LOCALAPI));
-        MutableLiveData<List<ImageResult>> mle = new MutableLiveData<List<ImageResult>>();
-        mle.postValue(imageResults);
-        return mle;
+        initialiseData();
+        return this.mImageResults;
     }
 
 
@@ -53,29 +49,37 @@ public class ImageResultRepository {
         return sInstance;
     }
 
-}
 
-    /** TODO -this method not needed in this case - simplified implementation uses REST pattern
+    /**
+     * TODO -this method not needed in this case - simplified implementation uses REST pattern
      * Creates periodic sync tasks and checks to see if an immediate sync is required. If an
      * immediate sync is required, this method will take care of making sure that sync occurs.
      */
-    /**private synchronized void initialiseData() {
+    private synchronized void initialiseData() {
 
         // Only perform initialization once per app lifetime. If initialization has already been
         // performed, we have nothing to do in this method.
-        if (mInitialised) return;
-        mInitialised = true;
+        if (mInitialised) {
+            updateDummyData();
+            return;
+        }
 
-        // This method call triggers the app to create its task to synchronize weather data
-        // periodically.
-        mImageResultNetworkDataSource.scheduleRecurringFetchWeatherSync();
-        mExecutors.diskIO().execute(() -> {
-            if (isFetchNeeded()) {
-                startFetchWeatherService();
-            }
-        });
+        mInitialised = true;
+        this.mImageResults = new MutableLiveData<List<ImageResult>>();
+        updateDummyData();
     }
-    **/
+
+    // TODO - remove this and replace with something useful
+    private void updateDummyData() {
+        Random random = new Random(System.nanoTime());
+        List<ImageResult> imageResults = new ArrayList<ImageResult>();
+        MutableLiveData<List<ImageResult>> mle = new MutableLiveData<List<ImageResult>>();
+        imageResults.add(new ImageResult("1", "weasel", (double) Math.round(random.nextDouble() * 1000d) / 1000d, ClassifierProvider.EINSTEINAI));
+        imageResults.add(new ImageResult("2", "rat", (double) Math.round(random.nextDouble() * 1000d) / 1000d, ClassifierProvider.GOOGLEAPI));
+        imageResults.add(new ImageResult("3", "field mouse", (double) Math.round(random.nextDouble() * 1000d) / 1000d, ClassifierProvider.LOCALAPI));
+        this.mImageResults.setValue(imageResults);
+    }
+}
 
 
     /**

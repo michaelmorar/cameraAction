@@ -67,16 +67,7 @@ public class MainActivity extends AppCompatActivity implements ImageResultsAdapt
         MainViewModelFactory factory = InjectorUtils.provideMainActivityViewModelFactory(this.getApplicationContext());
         mViewModel = ViewModelProviders.of(this, factory).get(MainActivityViewModel.class);
 
-        mViewModel.getImageResults().observe(this, imageResults -> {
-            mImageAdapter.swapForecast(imageResults);
-            if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
-            mRecyclerView.smoothScrollToPosition(mPosition);
-            // Show the image result list or the loading screen based on whether the image result data exists
-            // and is loaded
-            if (imageResults != null && imageResults.size() != 0) showImageResultView();
-            else showLoading();
-        });
-
+        getImageResults();
 
         /**The ForecastAdapter requires an
          * Android Context (which all Activities are) as well as an onClickHandler. Since our
@@ -96,8 +87,9 @@ public class MainActivity extends AppCompatActivity implements ImageResultsAdapt
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public  void onClick(View v) {
+                //getImageResults();
                 mViewModel.getImageResults();
-
+                //TODO update recycler view!
             }
         });
     }
@@ -109,7 +101,6 @@ public class MainActivity extends AppCompatActivity implements ImageResultsAdapt
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             Log.v("Bitmap_Output", imageBitmap.toString());
             mImageView.setImageBitmap(imageBitmap);
-
         }
     }
 
@@ -129,10 +120,23 @@ public class MainActivity extends AppCompatActivity implements ImageResultsAdapt
         cameraAction = findViewById(R.id.camFloatingActionButton);
         mProgressBar = findViewById(R.id.progressBar_loading);
         mProgressBar.setVisibility(View.INVISIBLE);
-
-        Log.v("4t", "CP4");
-
     }
+
+    /** Observe Image results repository
+     *
+     */
+    private void getImageResults() {
+        mViewModel.getImageResults().observe(this, imageResults -> {
+            mImageAdapter.swapForecast(imageResults);
+            if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
+            mRecyclerView.smoothScrollToPosition(mPosition);
+            // Show the image result list or the loading screen based on whether the image result data exists
+            // and is loaded
+            if (imageResults != null && imageResults.size() != 0) showImageResultView();
+            else showLoading();
+        });
+    }
+
 
     /**
      * This method is for responding to clicks from our list.

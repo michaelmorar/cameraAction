@@ -89,7 +89,7 @@ public class ImageResultsAdapter extends RecyclerView.Adapter<ImageResultsAdapte
         /***********************
          * Label *
          ***********************/
-        imageResultsAdapterViewHolder.labelView.setContentDescription(imageResult.getLabel());
+        imageResultsAdapterViewHolder.labelView.setText(imageResult.getLabel());
 
         /**************************
          * Probability *
@@ -100,7 +100,7 @@ public class ImageResultsAdapter extends RecyclerView.Adapter<ImageResultsAdapte
         /*************************
          * Provider *
          *************************/
-        imageResultsAdapterViewHolder.classifierProviderView.setContentDescription(imageResult.getClassifierProvider().toString());
+        imageResultsAdapterViewHolder.classifierProviderView.setText(imageResult.getClassifierProvider().toString());
     }
 
     /**

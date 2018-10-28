@@ -31,7 +31,7 @@ public class MainActivityViewModel extends ViewModel {
     }
 
     public LiveData<List<ImageResult>> getImageResults() {
-        return mRepository.getImageResults();
+        return this.mRepository.getImageResults();
     }
 
 
